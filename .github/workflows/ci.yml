@@ -1,0 +1,39 @@
+name: App CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build app
+        working-directory: ./aplicacao
+        run: docker-compose up -d
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Reset DB
+        working-directory: ./aplicacao
+        run: docker-compose run app rails db:reset
+      - name: Run Tests
+        working-directory: ./aplicacao
+        run: docker-compose run app rspec
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install rubocop
+        working-directory: ./aplicacao
+        run: docker-compose run app gem install rubocop
+      - name: Run lint
+        working-directory: ./aplicacao
+        run: docker-compose run app rubocop
