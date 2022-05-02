@@ -9,3 +9,24 @@ services:
       - "5432:5432"
     env_file:
       - db.env
+  app:
+    container_name: aplicacao
+    restart: on-failure
+    build: .
+    volumes:
+      - .:/aplicacao
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+
+  nginx:
+    container_name: nginx
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - app
